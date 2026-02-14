@@ -1,0 +1,36 @@
+.playlist-panel {
+  flex-shrink: 0;
+  max-height: 200px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.playlist-panel--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0.6;
+}
+
+.playlist-panel--empty p {
+  margin: 0;
+}
+
+.playlist-panel__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.playlist-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}

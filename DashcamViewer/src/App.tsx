@@ -14,6 +14,40 @@ function App() {
     state.currentIndex >= 0 ? state.playlist[state.currentIndex] : null
   const videoPlayer = useVideoPlayer(currentVideo, state.playbackSpeed)
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      // Don't capture shortcuts when typing in inputs
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      ) {
+        return
+      }
+
+      switch (e.key) {
+        case ' ':
+          e.preventDefault()
+          videoPlayer.togglePlay()
+          break
+        case 'ArrowLeft':
+          e.preventDefault()
+          videoPlayer.skip(-10)
+          break
+        case 'ArrowRight':
+          e.preventDefault()
+          videoPlayer.skip(10)
+          break
+        case 'f':
+          videoPlayer.toggleFullscreen()
+          break
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  })
+
   // Clean up all object URLs on unmount
   useEffect(() => {
     return () => {
@@ -42,7 +76,6 @@ function App() {
             onPause={() => dispatch({ type: 'SET_PLAYING', playing: false })}
           />
           <PlaybackControls
-            videoRef={videoPlayer.videoRef}
             isPlaying={state.isPlaying}
             playbackSpeed={state.playbackSpeed}
             hasVideo={currentVideo !== null}

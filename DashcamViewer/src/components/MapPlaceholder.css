@@ -1,0 +1,28 @@
+.map-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.map-placeholder__icon {
+  font-size: 2rem;
+}
+
+.map-placeholder__text {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.5;
+  text-align: center;
+}
+
+@media (prefers-color-scheme: light) {
+  .map-placeholder {
+    border-color: rgba(0, 0, 0, 0.15);
+  }
+}

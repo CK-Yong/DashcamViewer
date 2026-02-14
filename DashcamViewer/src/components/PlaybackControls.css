@@ -1,0 +1,24 @@
+.playback-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.playback-controls__group {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.playback-controls button {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.playback-controls__play {
+  font-size: 1.2rem !important;
+  padding: 0.4rem 1rem !important;
+}
