@@ -1,0 +1,100 @@
+import { arrayMove } from '@dnd-kit/sortable'
+import type { AppState, Action, VideoItem } from './types'
+
+export const initialState: AppState = {
+  playlist: [],
+  currentIndex: -1,
+  playbackSpeed: 1,
+  isPlaying: false,
+}
+
+export function appReducer(state: AppState, action: Action): AppState {
+  switch (action.type) {
+    case 'ADD_VIDEOS': {
+      const newItems: VideoItem[] = action.files.map((file) => ({
+        id: crypto.randomUUID(),
+        file,
+        objectUrl: URL.createObjectURL(file),
+        name: file.name,
+      }))
+      const playlist = [...state.playlist, ...newItems]
+      return {
+        ...state,
+        playlist,
+        currentIndex: state.currentIndex === -1 ? 0 : state.currentIndex,
+      }
+    }
+
+    case 'REMOVE_VIDEO': {
+      const removeIndex = state.playlist.findIndex((v) => v.id === action.id)
+      if (removeIndex === -1) return state
+
+      const item = state.playlist[removeIndex]
+      URL.revokeObjectURL(item.objectUrl)
+
+      const playlist = state.playlist.filter((v) => v.id !== action.id)
+      let { currentIndex } = state
+
+      if (playlist.length === 0) {
+        currentIndex = -1
+      } else if (removeIndex < currentIndex) {
+        currentIndex -= 1
+      } else if (removeIndex === currentIndex) {
+        currentIndex = Math.min(currentIndex, playlist.length - 1)
+      }
+
+      return { ...state, playlist, currentIndex }
+    }
+
+    case 'REORDER_PLAYLIST': {
+      const oldIndex = state.playlist.findIndex((v) => v.id === action.activeId)
+      const newIndex = state.playlist.findIndex((v) => v.id === action.overId)
+      if (oldIndex === -1 || newIndex === -1) return state
+
+      const playlist = arrayMove(state.playlist, oldIndex, newIndex)
+
+      // Track the currently playing video after reorder
+      const currentVideoId = state.playlist[state.currentIndex]?.id
+      const currentIndex = currentVideoId
+        ? playlist.findIndex((v) => v.id === currentVideoId)
+        : state.currentIndex
+
+      return { ...state, playlist, currentIndex }
+    }
+
+    case 'SELECT_VIDEO': {
+      if (action.index < 0 || action.index >= state.playlist.length) return state
+      return { ...state, currentIndex: action.index, isPlaying: true }
+    }
+
+    case 'NEXT_VIDEO': {
+      if (state.currentIndex >= state.playlist.length - 1) {
+        return { ...state, isPlaying: false }
+      }
+      return { ...state, currentIndex: state.currentIndex + 1, isPlaying: true }
+    }
+
+    case 'PREVIOUS_VIDEO': {
+      if (state.currentIndex <= 0) return state
+      return { ...state, currentIndex: state.currentIndex - 1, isPlaying: true }
+    }
+
+    case 'SET_SPEED': {
+      return { ...state, playbackSpeed: action.speed }
+    }
+
+    case 'SET_PLAYING': {
+      return { ...state, isPlaying: action.playing }
+    }
+
+    case 'CLEAR_PLAYLIST': {
+      for (const item of state.playlist) {
+        URL.revokeObjectURL(item.objectUrl)
+      }
+      return { ...initialState }
+    }
+
+    default:
+      return state
+  }
+}
