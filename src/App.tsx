@@ -2,7 +2,6 @@ import { useEffect, useReducer } from 'react'
 import { appReducer, initialState } from './reducer'
 import { Header } from './components/Header'
 import { VideoPlayer } from './components/VideoPlayer'
-import { PlaybackControls } from './components/PlaybackControls'
 import { MapPlaceholder } from './components/MapPlaceholder'
 import { PlaylistPanel } from './components/PlaylistPanel'
 import { useVideoPlayer } from './hooks/useVideoPlayer'
@@ -71,16 +70,15 @@ function App() {
           <VideoPlayer
             videoRef={videoPlayer.videoRef}
             src={currentVideo?.objectUrl ?? null}
+            isPlaying={state.isPlaying}
+            playbackSpeed={state.playbackSpeed}
+            hasPrevious={state.currentIndex > 0}
+            hasNext={state.currentIndex < state.playlist.length - 1}
+            currentTime={videoPlayer.currentTime}
+            duration={videoPlayer.duration}
             onEnded={() => dispatch({ type: 'NEXT_VIDEO' })}
             onPlay={() => dispatch({ type: 'SET_PLAYING', playing: true })}
             onPause={() => dispatch({ type: 'SET_PLAYING', playing: false })}
-          />
-          <PlaybackControls
-            isPlaying={state.isPlaying}
-            playbackSpeed={state.playbackSpeed}
-            hasVideo={currentVideo !== null}
-            hasPrevious={state.currentIndex > 0}
-            hasNext={state.currentIndex < state.playlist.length - 1}
             onTogglePlay={videoPlayer.togglePlay}
             onSkipForward={() => videoPlayer.skip(10)}
             onSkipBackward={() => videoPlayer.skip(-10)}
@@ -88,6 +86,7 @@ function App() {
             onPrevious={() => dispatch({ type: 'PREVIOUS_VIDEO' })}
             onNext={() => dispatch({ type: 'NEXT_VIDEO' })}
             onToggleFullscreen={videoPlayer.toggleFullscreen}
+            onSeek={videoPlayer.seek}
           />
         </div>
         <div className="map-section">
