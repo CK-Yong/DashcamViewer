@@ -2,9 +2,11 @@ import { useEffect, useReducer } from 'react'
 import { appReducer, initialState } from './reducer'
 import { Header } from './components/Header'
 import { VideoPlayer } from './components/VideoPlayer'
-import { MapPlaceholder } from './components/MapPlaceholder'
+import { DashcamMap } from './components/DashcamMap'
+import { GpsStats } from './components/GpsStats'
 import { PlaylistPanel } from './components/PlaylistPanel'
 import { useVideoPlayer } from './hooks/useVideoPlayer'
+import { useGpsExtraction } from './hooks/useGpsExtraction'
 import './App.css'
 
 function App() {
@@ -12,6 +14,7 @@ function App() {
   const currentVideo =
     state.currentIndex >= 0 ? state.playlist[state.currentIndex] : null
   const videoPlayer = useVideoPlayer(currentVideo, state.playbackSpeed)
+  const { extractGps } = useGpsExtraction(state, dispatch, videoPlayer.currentTime, videoPlayer.duration)
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -58,10 +61,15 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  function handleFilesSelected(files: File[], fileList: FileList) {
+    dispatch({ type: 'ADD_VIDEOS', files })
+    extractGps(fileList)
+  }
+
   return (
     <div className="app">
       <Header
-        onFilesSelected={(files) => dispatch({ type: 'ADD_VIDEOS', files })}
+        onFilesSelected={handleFilesSelected}
         onClearAll={() => dispatch({ type: 'CLEAR_PLAYLIST' })}
         hasVideos={state.playlist.length > 0}
       />
@@ -88,9 +96,13 @@ function App() {
             onToggleFullscreen={videoPlayer.toggleFullscreen}
             onSeek={videoPlayer.seek}
           />
+          <GpsStats gps={state.gps} />
         </div>
         <div className="map-section">
-          <MapPlaceholder currentVideo={currentVideo} />
+          <DashcamMap
+            track={state.gps.currentGpsTrack}
+            position={state.gps.currentPosition}
+          />
         </div>
       </div>
       <PlaylistPanel

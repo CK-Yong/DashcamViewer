@@ -1,0 +1,44 @@
+.dashcam-map-container {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dashcam-map {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  inset: 0;
+}
+
+.dashcam-map-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.dashcam-map-placeholder__icon {
+  font-size: 2rem;
+}
+
+.dashcam-map-placeholder__text {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.5;
+  text-align: center;
+}
+
+@media (prefers-color-scheme: light) {
+  .dashcam-map-placeholder {
+    border-color: rgba(0, 0, 0, 0.15);
+  }
+}

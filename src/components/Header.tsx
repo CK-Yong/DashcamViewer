@@ -2,7 +2,7 @@ import { FileUploadButton } from './FileUploadButton'
 import './Header.css'
 
 type HeaderProps = {
-  onFilesSelected: (files: File[]) => void
+  onFilesSelected: (files: File[], fileList: FileList) => void
   onClearAll: () => void
   hasVideos: boolean
 }

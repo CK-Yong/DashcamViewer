@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 
 type FileUploadButtonProps = {
-  onFilesSelected: (files: File[]) => void
+  onFilesSelected: (files: File[], fileList: FileList) => void
 }
 
 export function FileUploadButton({ onFilesSelected }: FileUploadButtonProps) {
@@ -10,7 +10,7 @@ export function FileUploadButton({ onFilesSelected }: FileUploadButtonProps) {
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files
     if (files && files.length > 0) {
-      onFilesSelected(Array.from(files))
+      onFilesSelected(Array.from(files), files)
     }
     // Reset so the same files can be re-selected
     e.target.value = ''

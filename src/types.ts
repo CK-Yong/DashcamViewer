@@ -1,3 +1,5 @@
+import type { DashCamVideo, GpsData } from './extract-gps/gps.ts'
+
 export type VideoItem = {
   id: string
   file: File
@@ -5,11 +7,21 @@ export type VideoItem = {
   name: string
 }
 
+export type GpsState = {
+  dashCamVideos: DashCamVideo[]
+  currentGpsTrack: GpsData[]
+  currentPosition: GpsData | null
+  isExtracting: boolean
+  extractionProgress: number
+  extractionTotal: number
+}
+
 export type AppState = {
   playlist: VideoItem[]
   currentIndex: number
   playbackSpeed: number
   isPlaying: boolean
+  gps: GpsState
 }
 
 export type Action =
@@ -22,3 +34,8 @@ export type Action =
   | { type: 'SET_SPEED'; speed: number }
   | { type: 'SET_PLAYING'; playing: boolean }
   | { type: 'CLEAR_PLAYLIST' }
+  | { type: 'GPS_EXTRACTION_START'; total: number }
+  | { type: 'GPS_EXTRACTION_PROGRESS' }
+  | { type: 'GPS_EXTRACTION_COMPLETE'; dashCamVideos: DashCamVideo[] }
+  | { type: 'GPS_SET_TRACK'; track: GpsData[] }
+  | { type: 'GPS_SET_POSITION'; position: GpsData | null }

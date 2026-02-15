@@ -1,0 +1,25 @@
+.gps-stats {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.gps-stats__extracting {
+  margin: 0;
+  font-style: italic;
+}
+
+.gps-stats__item {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.gps-stats__label {
+  opacity: 0.6;
+}
+
+.gps-stats__value {
+  font-variant-numeric: tabular-nums;
+}

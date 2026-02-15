@@ -1,11 +1,21 @@
 import { arrayMove } from '@dnd-kit/sortable'
-import type { AppState, Action, VideoItem } from './types'
+import type { AppState, Action, GpsState, VideoItem } from './types'
+
+const initialGpsState: GpsState = {
+  dashCamVideos: [],
+  currentGpsTrack: [],
+  currentPosition: null,
+  isExtracting: false,
+  extractionProgress: 0,
+  extractionTotal: 0,
+}
 
 export const initialState: AppState = {
   playlist: [],
   currentIndex: -1,
   playbackSpeed: 1,
   isPlaying: false,
+  gps: initialGpsState,
 }
 
 export function appReducer(state: AppState, action: Action): AppState {
@@ -92,6 +102,55 @@ export function appReducer(state: AppState, action: Action): AppState {
         URL.revokeObjectURL(item.objectUrl)
       }
       return { ...initialState }
+    }
+
+    case 'GPS_EXTRACTION_START': {
+      return {
+        ...state,
+        gps: {
+          ...state.gps,
+          isExtracting: true,
+          extractionProgress: 0,
+          extractionTotal: action.total,
+        },
+      }
+    }
+
+    case 'GPS_EXTRACTION_PROGRESS': {
+      return {
+        ...state,
+        gps: {
+          ...state.gps,
+          extractionProgress: state.gps.extractionProgress + 1,
+        },
+      }
+    }
+
+    case 'GPS_EXTRACTION_COMPLETE': {
+      return {
+        ...state,
+        gps: {
+          ...state.gps,
+          dashCamVideos: action.dashCamVideos,
+          isExtracting: false,
+          currentGpsTrack:
+            action.dashCamVideos.length > 0 ? action.dashCamVideos[0].frontGps : [],
+        },
+      }
+    }
+
+    case 'GPS_SET_TRACK': {
+      return {
+        ...state,
+        gps: { ...state.gps, currentGpsTrack: action.track },
+      }
+    }
+
+    case 'GPS_SET_POSITION': {
+      return {
+        ...state,
+        gps: { ...state.gps, currentPosition: action.position },
+      }
     }
 
     default:
