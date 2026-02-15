@@ -13,6 +13,41 @@
   inset: 0;
 }
 
+.dashcam-map-follow {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: white;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  padding: 6px 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.dashcam-map-follow:hover {
+  background: #f4f4f4;
+}
+
+.dashcam-map-follow--active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+  box-shadow: 0 1px 4px rgba(59, 130, 246, 0.4);
+}
+
+.dashcam-map-follow--active:hover {
+  background: #2563eb;
+}
+
 .dashcam-map-placeholder {
   position: absolute;
   inset: 0;

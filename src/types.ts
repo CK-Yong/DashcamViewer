@@ -9,6 +9,8 @@ export type VideoItem = {
 
 export type GpsState = {
   dashCamVideos: DashCamVideo[]
+  allGpsTracks: GpsData[][]
+  activeTrackIndex: number
   currentGpsTrack: GpsData[]
   currentPosition: GpsData | null
   isExtracting: boolean
@@ -37,5 +39,5 @@ export type Action =
   | { type: 'GPS_EXTRACTION_START'; total: number }
   | { type: 'GPS_EXTRACTION_PROGRESS' }
   | { type: 'GPS_EXTRACTION_COMPLETE'; dashCamVideos: DashCamVideo[] }
-  | { type: 'GPS_SET_TRACK'; track: GpsData[] }
+  | { type: 'GPS_SET_TRACK'; track: GpsData[]; trackIndex: number }
   | { type: 'GPS_SET_POSITION'; position: GpsData | null }

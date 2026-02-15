@@ -9,6 +9,8 @@ export function useVideoPlayer(
   const currentSrc = currentVideo?.objectUrl ?? null
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [volume, setVolume] = useState(1)
+  const [isMuted, setIsMuted] = useState(false)
 
   // Sync playback rate when speed changes
   useEffect(() => {
@@ -78,6 +80,24 @@ export function useVideoPlayer(
     )
   }
 
+  function changeVolume(value: number) {
+    const clamped = Math.max(0, Math.min(1, value))
+    setVolume(clamped)
+    setIsMuted(clamped === 0)
+    if (videoRef.current) {
+      videoRef.current.volume = clamped
+      videoRef.current.muted = clamped === 0
+    }
+  }
+
+  function toggleMute() {
+    const next = !isMuted
+    setIsMuted(next)
+    if (videoRef.current) {
+      videoRef.current.muted = next
+    }
+  }
+
   function toggleFullscreen() {
     const video = videoRef.current
     if (!video) return
@@ -88,5 +108,5 @@ export function useVideoPlayer(
     }
   }
 
-  return { videoRef, togglePlay, skip, seek, toggleFullscreen, currentTime, duration }
+  return { videoRef, togglePlay, skip, seek, toggleFullscreen, changeVolume, toggleMute, currentTime, duration, volume, isMuted }
 }

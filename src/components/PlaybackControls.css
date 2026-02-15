@@ -70,4 +70,20 @@
   cursor: default;
 }
 
+.playback-controls__volume {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
 
+.playback-controls__volume-slider {
+  width: 70px;
+  height: 4px;
+  cursor: pointer;
+  accent-color: #646cff;
+}
+
+.playback-controls__volume-slider:disabled {
+  cursor: default;
+  opacity: 0.3;
+}

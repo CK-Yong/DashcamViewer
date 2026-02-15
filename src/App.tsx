@@ -95,12 +95,17 @@ function App() {
             onNext={() => dispatch({ type: 'NEXT_VIDEO' })}
             onToggleFullscreen={videoPlayer.toggleFullscreen}
             onSeek={videoPlayer.seek}
+            volume={videoPlayer.volume}
+            isMuted={videoPlayer.isMuted}
+            onChangeVolume={videoPlayer.changeVolume}
+            onToggleMute={videoPlayer.toggleMute}
           />
           <GpsStats gps={state.gps} />
         </div>
         <div className="map-section">
           <DashcamMap
-            track={state.gps.currentGpsTrack}
+            allTracks={state.gps.allGpsTracks}
+            activeTrackIndex={state.gps.activeTrackIndex}
             position={state.gps.currentPosition}
           />
         </div>

@@ -22,6 +22,10 @@ type VideoPlayerProps = {
   onNext: () => void
   onToggleFullscreen: () => void
   onSeek: (time: number) => void
+  volume: number
+  isMuted: boolean
+  onChangeVolume: (volume: number) => void
+  onToggleMute: () => void
 }
 
 export function VideoPlayer({
@@ -44,6 +48,10 @@ export function VideoPlayer({
   onNext,
   onToggleFullscreen,
   onSeek,
+  volume,
+  isMuted,
+  onChangeVolume,
+  onToggleMute,
 }: VideoPlayerProps) {
   if (!src) {
     return (
@@ -81,6 +89,10 @@ export function VideoPlayer({
           onNext={onNext}
           onToggleFullscreen={onToggleFullscreen}
           onSeek={onSeek}
+          volume={volume}
+          isMuted={isMuted}
+          onChangeVolume={onChangeVolume}
+          onToggleMute={onToggleMute}
         />
       </div>
     </div>

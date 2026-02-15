@@ -3,6 +3,8 @@ import type { AppState, Action, GpsState, VideoItem } from './types'
 
 const initialGpsState: GpsState = {
   dashCamVideos: [],
+  allGpsTracks: [],
+  activeTrackIndex: -1,
   currentGpsTrack: [],
   currentPosition: null,
   isExtracting: false,
@@ -127,14 +129,17 @@ export function appReducer(state: AppState, action: Action): AppState {
     }
 
     case 'GPS_EXTRACTION_COMPLETE': {
+      const allGpsTracks = action.dashCamVideos.map((dcv) => dcv.frontGps)
       return {
         ...state,
         gps: {
           ...state.gps,
           dashCamVideos: action.dashCamVideos,
+          allGpsTracks,
+          activeTrackIndex: allGpsTracks.length > 0 ? 0 : -1,
           isExtracting: false,
           currentGpsTrack:
-            action.dashCamVideos.length > 0 ? action.dashCamVideos[0].frontGps : [],
+            allGpsTracks.length > 0 ? allGpsTracks[0] : [],
         },
       }
     }
@@ -142,7 +147,11 @@ export function appReducer(state: AppState, action: Action): AppState {
     case 'GPS_SET_TRACK': {
       return {
         ...state,
-        gps: { ...state.gps, currentGpsTrack: action.track },
+        gps: {
+          ...state.gps,
+          currentGpsTrack: action.track,
+          activeTrackIndex: action.trackIndex,
+        },
       }
     }
 

@@ -59,14 +59,15 @@ export function useGpsExtraction(
     if (!currentVideo || dashCamVideos.length === 0) return
 
     // Find the matching dashcam video by filename
-    const match = dashCamVideos.find(
+    const matchIndex = dashCamVideos.findIndex(
       (dcv) =>
         dcv.frontView.name === currentVideo.file.name ||
         dcv.rearView?.name === currentVideo.file.name,
     )
 
-    if (match) {
-      dispatch({ type: 'GPS_SET_TRACK', track: match.frontGps })
+    if (matchIndex !== -1) {
+      const match = dashCamVideos[matchIndex]
+      dispatch({ type: 'GPS_SET_TRACK', track: match.frontGps, trackIndex: matchIndex })
       if (match.frontGps.length > 0) {
         dispatch({ type: 'GPS_SET_POSITION', position: match.frontGps[0] })
       }

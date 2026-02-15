@@ -44,6 +44,26 @@ function IconPause() {
   )
 }
 
+function IconVolume() {
+  return (
+    <svg width={ICON} height={ICON} viewBox="0 0 24 24" fill="currentColor">
+      <polygon points="3,9 7,9 12,4 12,20 7,15 3,15" />
+      <path d="M16 8.5c1.3 1.3 1.3 5.7 0 7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M19 5.5c3 3 3 10 0 13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IconVolumeMuted() {
+  return (
+    <svg width={ICON} height={ICON} viewBox="0 0 24 24" fill="currentColor">
+      <polygon points="3,9 7,9 12,4 12,20 7,15 3,15" />
+      <line x1="16" y1="9" x2="22" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line x1="22" y1="9" x2="16" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 function IconFullscreen() {
   return (
     <svg width={ICON} height={ICON} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -71,6 +91,10 @@ type PlaybackControlsProps = {
   onNext: () => void
   onToggleFullscreen: () => void
   onSeek: (time: number) => void
+  volume: number
+  isMuted: boolean
+  onChangeVolume: (volume: number) => void
+  onToggleMute: () => void
 }
 
 export function PlaybackControls({
@@ -89,6 +113,10 @@ export function PlaybackControls({
   onNext,
   onToggleFullscreen,
   onSeek,
+  volume,
+  isMuted,
+  onChangeVolume,
+  onToggleMute,
 }: PlaybackControlsProps) {
   function cycleSpeed() {
     const currentIdx = SPEED_OPTIONS.indexOf(
@@ -160,6 +188,25 @@ export function PlaybackControls({
           >
             {playbackSpeed}x
           </button>
+          <div className="playback-controls__volume">
+            <button
+              onClick={onToggleMute}
+              disabled={!hasVideo}
+              title={isMuted ? 'Unmute' : 'Mute'}
+            >
+              {isMuted ? <IconVolumeMuted /> : <IconVolume />}
+            </button>
+            <input
+              type="range"
+              className="playback-controls__volume-slider"
+              min={0}
+              max={1}
+              step={0.05}
+              value={isMuted ? 0 : volume}
+              onChange={(e) => onChangeVolume(Number(e.target.value))}
+              disabled={!hasVideo}
+            />
+          </div>
           <button
             onClick={onToggleFullscreen}
             disabled={!hasVideo}
