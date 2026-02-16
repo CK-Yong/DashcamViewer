@@ -23,7 +23,10 @@ export const initialState: AppState = {
 export function appReducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case 'ADD_VIDEOS': {
-      const newItems: VideoItem[] = action.files.map((file) => ({
+      const frontFiles = action.files.filter(
+        (file) => !file.name.toLowerCase().endsWith('r.mp4'),
+      )
+      const newItems: VideoItem[] = frontFiles.map((file) => ({
         id: crypto.randomUUID(),
         file,
         objectUrl: URL.createObjectURL(file),

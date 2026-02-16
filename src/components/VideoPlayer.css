@@ -21,6 +21,40 @@
   cursor: pointer;
 }
 
+.video-player__pip {
+  position: absolute;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  background: #000;
+  z-index: 2;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.video-player__pip:active {
+  cursor: grabbing;
+}
+
+.video-player__pip-video {
+  width: 100%;
+  display: block;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.video-player__pip-resize {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+  background: linear-gradient(135deg, transparent 50%, rgba(255, 255, 255, 0.4) 50%);
+  border-radius: 0 0 4px 0;
+}
+
 .video-player__overlay {
   position: absolute;
   bottom: 0;

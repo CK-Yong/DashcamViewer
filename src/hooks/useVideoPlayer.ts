@@ -6,6 +6,7 @@ export function useVideoPlayer(
   playbackSpeed: number,
 ) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const rearVideoRef = useRef<HTMLVideoElement>(null)
   const currentSrc = currentVideo?.objectUrl ?? null
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -17,6 +18,9 @@ export function useVideoPlayer(
     if (videoRef.current) {
       videoRef.current.playbackRate = playbackSpeed
     }
+    if (rearVideoRef.current) {
+      rearVideoRef.current.playbackRate = playbackSpeed
+    }
   }, [playbackSpeed])
 
   // Auto-play when video source changes
@@ -25,6 +29,34 @@ export function useVideoPlayer(
       videoRef.current.play().catch(() => {
         // Browser may block autoplay; user will need to click play
       })
+    }
+  }, [currentSrc])
+
+  // Sync rear video with front video play/pause/seek
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    function syncRear() {
+      const rear = rearVideoRef.current
+      if (!rear) return
+      rear.currentTime = video!.currentTime
+      rear.playbackRate = video!.playbackRate
+      if (!video!.paused) {
+        rear.play().catch(() => {})
+      } else {
+        rear.pause()
+      }
+    }
+
+    video.addEventListener('play', syncRear)
+    video.addEventListener('pause', syncRear)
+    video.addEventListener('seeked', syncRear)
+
+    return () => {
+      video.removeEventListener('play', syncRear)
+      video.removeEventListener('pause', syncRear)
+      video.removeEventListener('seeked', syncRear)
     }
   }, [currentSrc])
 
@@ -59,6 +91,9 @@ export function useVideoPlayer(
     const video = videoRef.current
     if (!video) return
     video.currentTime = time
+    if (rearVideoRef.current) {
+      rearVideoRef.current.currentTime = time
+    }
   }
 
   function togglePlay() {
@@ -66,18 +101,24 @@ export function useVideoPlayer(
     if (!video) return
     if (video.paused) {
       video.play().catch(() => {})
+      rearVideoRef.current?.play().catch(() => {})
     } else {
       video.pause()
+      rearVideoRef.current?.pause()
     }
   }
 
   function skip(seconds: number) {
     const video = videoRef.current
     if (!video) return
-    video.currentTime = Math.max(
+    const newTime = Math.max(
       0,
       Math.min(video.currentTime + seconds, video.duration || 0),
     )
+    video.currentTime = newTime
+    if (rearVideoRef.current) {
+      rearVideoRef.current.currentTime = newTime
+    }
   }
 
   function changeVolume(value: number) {
@@ -108,5 +149,5 @@ export function useVideoPlayer(
     }
   }
 
-  return { videoRef, togglePlay, skip, seek, toggleFullscreen, changeVolume, toggleMute, currentTime, duration, volume, isMuted }
+  return { videoRef, rearVideoRef, togglePlay, skip, seek, toggleFullscreen, changeVolume, toggleMute, currentTime, duration, volume, isMuted }
 }

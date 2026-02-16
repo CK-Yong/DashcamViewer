@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react'
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { appReducer, initialState } from './reducer'
 import { Header } from './components/Header'
 import { VideoPlayer } from './components/VideoPlayer'
@@ -15,6 +15,30 @@ function App() {
     state.currentIndex >= 0 ? state.playlist[state.currentIndex] : null
   const videoPlayer = useVideoPlayer(currentVideo, state.playbackSpeed)
   const { extractGps } = useGpsExtraction(state, dispatch, videoPlayer.currentTime, videoPlayer.duration)
+
+  // Derive rear video object URL from the dashCamVideos pairing
+  const rearFile = useMemo(() => {
+    if (!currentVideo) return undefined
+    const dcv = state.gps.dashCamVideos.find(
+      (d) => d.frontView.name === currentVideo.file.name,
+    )
+    return dcv?.rearView
+  }, [currentVideo, state.gps.dashCamVideos])
+
+  const [rearSrc, setRearSrc] = useState<string | null>(null)
+  const prevRearFileRef = useRef<File | undefined>(undefined)
+
+  useEffect(() => {
+    if (rearFile === prevRearFileRef.current) return
+    if (prevRearFileRef.current) {
+      URL.revokeObjectURL(rearSrc!)
+    }
+    prevRearFileRef.current = rearFile
+    setRearSrc(rearFile ? URL.createObjectURL(rearFile) : null)
+    return () => {
+      // cleanup on unmount
+    }
+  }, [rearFile]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -77,7 +101,9 @@ function App() {
         <div className="video-section">
           <VideoPlayer
             videoRef={videoPlayer.videoRef}
+            rearVideoRef={videoPlayer.rearVideoRef}
             src={currentVideo?.objectUrl ?? null}
+            rearSrc={rearSrc}
             isPlaying={state.isPlaying}
             playbackSpeed={state.playbackSpeed}
             hasPrevious={state.currentIndex > 0}
