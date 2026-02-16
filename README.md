@@ -1,75 +1,47 @@
-# React + TypeScript + Vite
+# Dashcam Viewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A browser-based dashcam video viewer with GPS map integration. Load dashcam footage, view front and rear camera feeds simultaneously, and see the driven route on an interactive map.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Video Playback** — Play, pause, seek, skip, adjust speed, and control volume
+- **Front + Rear Camera** — Rear camera shown as a draggable, resizable picture-in-picture overlay synced to the front video
+- **GPS Map** — Extracts GPS data from dashcam MP4 files and displays the route on a Leaflet map
+- **Multi-Video Routes** — All loaded video routes displayed on the map simultaneously
+- **Follow Mode** — Keep the map centered on the current position during playback
+- **GPS Stats** — Live latitude, longitude, and speed readout synced to playback position
+- **Playlist** — Drag-and-drop reorderable playlist with keyboard shortcuts
+- **Web Workers** — GPS extraction runs in parallel to keep the UI responsive
 
-## React Compiler
+## Supported Cameras
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- Viofo (binary GPS data from MP4 atoms)
+- Vantrue (GNRMC string parsing)
 
-Note: This will impact Vite dev & build performances.
+Front/rear video pairing is automatic based on file naming conventions (`*F.MP4` / `*R.MP4`) and timestamp matching.
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open http://localhost:5173 in your browser, then use the file picker to load your dashcam MP4 files.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server with HMR |
+| `npm run build` | Type-check and build for production |
+| `npm run preview` | Preview the production build |
+| `npm run lint` | Run ESLint |
+
+## Tech Stack
+
+- React 19 + TypeScript
+- Vite
+- Leaflet (vanilla, no wrapper library)
+- dnd-kit (drag-and-drop playlist)
+- Web Workers (parallel GPS extraction)
