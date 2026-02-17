@@ -126,7 +126,6 @@ function App() {
             onChangeVolume={videoPlayer.changeVolume}
             onToggleMute={videoPlayer.toggleMute}
           />
-          <GpsStats gps={state.gps} />
         </div>
         <div className="map-section">
           <DashcamMap
@@ -136,9 +135,11 @@ function App() {
           />
         </div>
       </div>
+      <GpsStats gps={state.gps} />
       <PlaylistPanel
         playlist={state.playlist}
         currentIndex={state.currentIndex}
+        dashCamVideos={state.gps.dashCamVideos}
         onSelect={(index) => dispatch({ type: 'SELECT_VIDEO', index })}
         onRemove={(id) => dispatch({ type: 'REMOVE_VIDEO', id })}
         onReorder={(activeId, overId) =>

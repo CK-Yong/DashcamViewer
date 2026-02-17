@@ -13,12 +13,14 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import type { VideoItem } from '../types'
+import type { DashCamVideo } from '../extract-gps/gps'
 import { SortablePlaylistItem } from './SortablePlaylistItem'
 import './PlaylistPanel.css'
 
 type PlaylistPanelProps = {
   playlist: VideoItem[]
   currentIndex: number
+  dashCamVideos: DashCamVideo[]
   onSelect: (index: number) => void
   onRemove: (id: string) => void
   onReorder: (activeId: string, overId: string) => void
@@ -27,6 +29,7 @@ type PlaylistPanelProps = {
 export function PlaylistPanel({
   playlist,
   currentIndex,
+  dashCamVideos,
   onSelect,
   onRemove,
   onReorder,
@@ -70,16 +73,22 @@ export function PlaylistPanel({
             items={playlist.map((v) => v.id)}
             strategy={verticalListSortingStrategy}
           >
-            {playlist.map((video, index) => (
-              <SortablePlaylistItem
-                key={video.id}
-                video={video}
-                isActive={index === currentIndex}
-                index={index}
-                onSelect={onSelect}
-                onRemove={onRemove}
-              />
-            ))}
+            {playlist.map((video, index) => {
+              const dcv = dashCamVideos.find(
+                (d) => d.frontView.name === video.file.name,
+              )
+              return (
+                <SortablePlaylistItem
+                  key={video.id}
+                  video={video}
+                  isActive={index === currentIndex}
+                  index={index}
+                  rearViewName={dcv?.rearView?.name}
+                  onSelect={onSelect}
+                  onRemove={onRemove}
+                />
+              )
+            })}
           </SortableContext>
         </DndContext>
       </div>

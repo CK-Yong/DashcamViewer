@@ -7,6 +7,7 @@ type SortablePlaylistItemProps = {
   video: VideoItem
   isActive: boolean
   index: number
+  rearViewName?: string
   onSelect: (index: number) => void
   onRemove: (id: string) => void
 }
@@ -15,6 +16,7 @@ export function SortablePlaylistItem({
   video,
   isActive,
   index,
+  rearViewName,
   onSelect,
   onRemove,
 }: SortablePlaylistItemProps) {
@@ -53,7 +55,14 @@ export function SortablePlaylistItem({
         title={video.name}
       >
         {isActive && <span className="playlist-item__playing-indicator" />}
-        <span className="playlist-item__text">{video.name}</span>
+        <div className="playlist-item__info">
+          <span className="playlist-item__text">{video.name}</span>
+          {rearViewName && (
+            <span className="playlist-item__rear-badge" title={`Rear: ${rearViewName}`}>
+              F+R
+            </span>
+          )}
+        </div>
       </button>
       <button
         className="playlist-item__remove"
