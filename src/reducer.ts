@@ -70,7 +70,42 @@ export function appReducer(state: AppState, action: Action): AppState {
         currentIndex = Math.min(currentIndex, playlist.length - 1)
       }
 
-      return { ...state, playlist, currentIndex }
+      // Remove corresponding GPS data
+      const removedName = item.file.name
+      const removedGpsIndex = state.gps.dashCamVideos.findIndex(
+        (d) => d.frontView.name === removedName,
+      )
+      const dashCamVideos = state.gps.dashCamVideos.filter(
+        (d) => d.frontView.name !== removedName,
+      )
+      const allGpsTracks = dashCamVideos.map((d) => d.frontGps)
+
+      let activeTrackIndex = state.gps.activeTrackIndex
+      if (removedGpsIndex !== -1) {
+        if (allGpsTracks.length === 0) {
+          activeTrackIndex = -1
+        } else if (removedGpsIndex < activeTrackIndex) {
+          activeTrackIndex -= 1
+        } else if (removedGpsIndex === activeTrackIndex) {
+          activeTrackIndex = Math.min(activeTrackIndex, allGpsTracks.length - 1)
+        }
+      }
+
+      return {
+        ...state,
+        playlist,
+        currentIndex,
+        gps: {
+          ...state.gps,
+          dashCamVideos,
+          allGpsTracks,
+          activeTrackIndex,
+          currentGpsTrack:
+            activeTrackIndex >= 0 ? allGpsTracks[activeTrackIndex] : [],
+          currentPosition:
+            allGpsTracks.length === 0 ? null : state.gps.currentPosition,
+        },
+      }
     }
 
     case 'REORDER_PLAYLIST': {
