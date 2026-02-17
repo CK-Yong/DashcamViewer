@@ -1,5 +1,5 @@
 import { arrayMove } from '@dnd-kit/sortable'
-import type { AppState, Action, GpsState, VideoItem } from './types'
+import type { AppState, Action, ExportState, GpsState, TrimState, VideoItem } from './types'
 
 const initialGpsState: GpsState = {
   dashCamVideos: [],
@@ -12,12 +12,24 @@ const initialGpsState: GpsState = {
   extractionTotal: 0,
 }
 
+const initialTrimState: TrimState = {
+  inPoint: null,
+  outPoint: null,
+}
+
+const initialExportState: ExportState = {
+  status: { phase: 'idle' },
+}
+
 export const initialState: AppState = {
+  mode: 'viewer',
   playlist: [],
   currentIndex: -1,
   playbackSpeed: 1,
   isPlaying: false,
   gps: initialGpsState,
+  trim: initialTrimState,
+  export: initialExportState,
 }
 
 export function appReducer(state: AppState, action: Action): AppState {
@@ -163,6 +175,73 @@ export function appReducer(state: AppState, action: Action): AppState {
         ...state,
         gps: { ...state.gps, currentPosition: action.position },
       }
+    }
+
+    case 'SET_MODE': {
+      return { ...state, mode: action.mode }
+    }
+
+    case 'TRIM_SET_IN': {
+      return {
+        ...state,
+        trim: { ...state.trim, inPoint: action.time },
+      }
+    }
+
+    case 'TRIM_SET_OUT': {
+      return {
+        ...state,
+        trim: { ...state.trim, outPoint: action.time },
+      }
+    }
+
+    case 'TRIM_CLEAR': {
+      return { ...state, trim: initialTrimState }
+    }
+
+    case 'EXPORT_START': {
+      return {
+        ...state,
+        export: { status: { phase: 'preparing' } },
+      }
+    }
+
+    case 'EXPORT_PROGRESS': {
+      return {
+        ...state,
+        export: { status: { phase: 'encoding', progress: action.progress } },
+      }
+    }
+
+    case 'EXPORT_MUXING': {
+      return {
+        ...state,
+        export: { status: { phase: 'muxing' } },
+      }
+    }
+
+    case 'EXPORT_DONE': {
+      return {
+        ...state,
+        export: {
+          status: {
+            phase: 'done',
+            blobUrl: action.blobUrl,
+            filename: action.filename,
+          },
+        },
+      }
+    }
+
+    case 'EXPORT_ERROR': {
+      return {
+        ...state,
+        export: { status: { phase: 'error', message: action.message } },
+      }
+    }
+
+    case 'EXPORT_RESET': {
+      return { ...state, export: initialExportState }
     }
 
     default:

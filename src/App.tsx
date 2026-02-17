@@ -7,6 +7,7 @@ import { GpsStats } from './components/GpsStats'
 import { PlaylistPanel } from './components/PlaylistPanel'
 import { useVideoPlayer } from './hooks/useVideoPlayer'
 import { useGpsExtraction } from './hooks/useGpsExtraction'
+import { useVideoExport } from './hooks/useVideoExport'
 import './App.css'
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
     state.currentIndex >= 0 ? state.playlist[state.currentIndex] : null
   const videoPlayer = useVideoPlayer(currentVideo, state.playbackSpeed)
   const { extractGps } = useGpsExtraction(state, dispatch, videoPlayer.currentTime, videoPlayer.duration)
+  const { startExport } = useVideoExport(dispatch)
 
   // Derive rear video object URL from the dashCamVideos pairing
   const rearFile = useMemo(() => {
@@ -67,6 +69,16 @@ function App() {
         case 'f':
           videoPlayer.toggleFullscreen()
           break
+        case 'i':
+          if (state.mode === 'editor') {
+            dispatch({ type: 'TRIM_SET_IN', time: videoPlayer.currentTime })
+          }
+          break
+        case 'o':
+          if (state.mode === 'editor') {
+            dispatch({ type: 'TRIM_SET_OUT', time: videoPlayer.currentTime })
+          }
+          break
       }
     }
 
@@ -85,6 +97,17 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  function handleExport() {
+    if (!currentVideo || state.trim.inPoint === null || state.trim.outPoint === null) return
+    startExport({
+      frontFile: currentVideo.file,
+      rearFile,
+      inPoint: state.trim.inPoint,
+      outPoint: state.trim.outPoint,
+      pipLayout: undefined, // TODO: get from VideoPlayer pip position
+    })
+  }
+
   function handleFilesSelected(files: File[], fileList: FileList) {
     dispatch({ type: 'ADD_VIDEOS', files })
     extractGps(fileList)
@@ -93,11 +116,13 @@ function App() {
   return (
     <div className="app">
       <Header
+        mode={state.mode}
+        onModeChange={(mode) => dispatch({ type: 'SET_MODE', mode })}
         onFilesSelected={handleFilesSelected}
         onClearAll={() => dispatch({ type: 'CLEAR_PLAYLIST' })}
         hasVideos={state.playlist.length > 0}
       />
-      <div className="main-layout">
+      <div className={`main-layout ${state.mode === 'editor' ? 'main-layout--editor' : ''}`}>
         <div className="video-section">
           <VideoPlayer
             videoRef={videoPlayer.videoRef}
@@ -125,17 +150,27 @@ function App() {
             isMuted={videoPlayer.isMuted}
             onChangeVolume={videoPlayer.changeVolume}
             onToggleMute={videoPlayer.toggleMute}
+            mode={state.mode}
+            trim={state.trim}
+            onSetTrimIn={() => dispatch({ type: 'TRIM_SET_IN', time: videoPlayer.currentTime })}
+            onSetTrimOut={() => dispatch({ type: 'TRIM_SET_OUT', time: videoPlayer.currentTime })}
+            onClearTrim={() => dispatch({ type: 'TRIM_CLEAR' })}
+            exportState={state.export}
+            onExport={handleExport}
+            onExportReset={() => dispatch({ type: 'EXPORT_RESET' })}
           />
         </div>
-        <div className="map-section">
-          <DashcamMap
-            allTracks={state.gps.allGpsTracks}
-            activeTrackIndex={state.gps.activeTrackIndex}
-            position={state.gps.currentPosition}
-          />
-        </div>
+        {state.mode === 'viewer' && (
+          <div className="map-section">
+            <DashcamMap
+              allTracks={state.gps.allGpsTracks}
+              activeTrackIndex={state.gps.activeTrackIndex}
+              position={state.gps.currentPosition}
+            />
+          </div>
+        )}
       </div>
-      <GpsStats gps={state.gps} />
+      {state.mode === 'viewer' && <GpsStats gps={state.gps} />}
       <PlaylistPanel
         playlist={state.playlist}
         currentIndex={state.currentIndex}

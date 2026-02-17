@@ -1,0 +1,183 @@
+.trim-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.trim-controls__timeline {
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+.trim-controls__track {
+  position: relative;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+.trim-controls__range {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(100, 108, 255, 0.35);
+  border-radius: 3px;
+}
+
+.trim-controls__marker {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 14px;
+  border-radius: 1px;
+  transform: translateX(-1px);
+}
+
+.trim-controls__marker--in {
+  background: #34d399;
+}
+
+.trim-controls__marker--out {
+  background: #f87171;
+}
+
+.trim-controls__playhead {
+  position: absolute;
+  top: -2px;
+  width: 2px;
+  height: 10px;
+  background: #fff;
+  border-radius: 1px;
+  transform: translateX(-1px);
+  pointer-events: none;
+}
+
+.trim-controls__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.trim-controls__points {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.trim-controls__btn {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font-size: 0.78rem;
+  font-family: monospace;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.trim-controls__btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.trim-controls__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.trim-controls__btn--clear {
+  font-family: inherit;
+  opacity: 0.7;
+}
+
+.trim-controls__btn--export {
+  background: rgba(100, 108, 255, 0.25);
+  border-color: rgba(100, 108, 255, 0.4);
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.trim-controls__btn--export:hover:not(:disabled) {
+  background: rgba(100, 108, 255, 0.4);
+}
+
+.trim-controls__btn--download {
+  display: inline-block;
+  text-decoration: none;
+  background: rgba(52, 211, 153, 0.2);
+  border-color: rgba(52, 211, 153, 0.4);
+  font-family: inherit;
+  font-weight: 500;
+  color: #34d399;
+}
+
+.trim-controls__export-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trim-controls__duration {
+  font-size: 0.78rem;
+  font-family: monospace;
+  opacity: 0.7;
+}
+
+.trim-controls__error {
+  font-size: 0.75rem;
+  color: #f87171;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trim-controls__progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trim-controls__progress-bar {
+  width: 100px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.trim-controls__progress-fill {
+  height: 100%;
+  background: #646cff;
+  border-radius: 3px;
+  transition: width 0.2s;
+}
+
+.trim-controls__progress-label {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+@media (prefers-color-scheme: light) {
+  .trim-controls__track {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  .trim-controls__btn {
+    border-color: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  .trim-controls__btn:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  .trim-controls__progress-bar {
+    background: rgba(0, 0, 0, 0.08);
+  }
+}

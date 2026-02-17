@@ -26,6 +26,10 @@
   min-height: 0;
 }
 
+.main-layout--editor {
+  grid-template-columns: 1fr;
+}
+
 @media (max-width: 768px) {
   .main-layout {
     grid-template-columns: 1fr;

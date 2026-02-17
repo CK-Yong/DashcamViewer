@@ -1,6 +1,8 @@
 import type { RefObject } from 'react'
 import { useCallback, useRef, useState } from 'react'
+import type { AppMode, TrimState, ExportState } from '../types'
 import { PlaybackControls } from './PlaybackControls'
+import { TrimControls } from './TrimControls'
 import './VideoPlayer.css'
 
 type VideoPlayerProps = {
@@ -29,6 +31,14 @@ type VideoPlayerProps = {
   isMuted: boolean
   onChangeVolume: (volume: number) => void
   onToggleMute: () => void
+  mode?: AppMode
+  trim?: TrimState
+  onSetTrimIn?: () => void
+  onSetTrimOut?: () => void
+  onClearTrim?: () => void
+  exportState?: ExportState
+  onExport?: () => void
+  onExportReset?: () => void
 }
 
 export function VideoPlayer({
@@ -57,6 +67,14 @@ export function VideoPlayer({
   isMuted,
   onChangeVolume,
   onToggleMute,
+  mode = 'viewer',
+  trim,
+  onSetTrimIn,
+  onSetTrimOut,
+  onClearTrim,
+  exportState,
+  onExport,
+  onExportReset,
 }: VideoPlayerProps) {
   const PIP_MARGIN = 8
   const PIP_MIN_W = 120
@@ -198,6 +216,19 @@ export function VideoPlayer({
           onChangeVolume={onChangeVolume}
           onToggleMute={onToggleMute}
         />
+        {mode === 'editor' && trim && exportState && onSetTrimIn && onSetTrimOut && onClearTrim && onExport && onExportReset && (
+          <TrimControls
+            trim={trim}
+            duration={duration}
+            currentTime={currentTime}
+            exportState={exportState}
+            onSetIn={onSetTrimIn}
+            onSetOut={onSetTrimOut}
+            onClear={onClearTrim}
+            onExport={onExport}
+            onExportReset={onExportReset}
+          />
+        )}
       </div>
     </div>
   )
