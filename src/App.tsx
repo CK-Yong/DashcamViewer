@@ -97,14 +97,15 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function handleExport() {
+  function handleExport(pipLayout: import('./types').PipLayout | undefined, outputHeight: number | null) {
     if (!currentVideo || state.trim.inPoint === null || state.trim.outPoint === null) return
     startExport({
       frontFile: currentVideo.file,
       rearFile,
       inPoint: state.trim.inPoint,
       outPoint: state.trim.outPoint,
-      pipLayout: undefined, // TODO: get from VideoPlayer pip position
+      pipLayout,
+      outputHeight,
     })
   }
 

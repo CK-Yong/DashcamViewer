@@ -6,6 +6,7 @@ import {
   Mp4OutputFormat,
   BufferTarget,
   BlobSource,
+  VideoSampleSink,
   ALL_FORMATS,
 } from 'mediabunny'
 import type { Action, PipLayout } from '../types'
@@ -16,14 +17,22 @@ type ExportParams = {
   inPoint: number
   outPoint: number
   pipLayout: PipLayout | undefined
+  outputHeight: number | null
+}
+
+type RearFrame = {
+  timestamp: number
+  bitmap: ImageBitmap
 }
 
 export function useVideoExport(dispatch: React.Dispatch<Action>) {
   const conversionRef = useRef<Conversion | null>(null)
 
   const startExport = useCallback(
-    async ({ frontFile, rearFile, inPoint, outPoint, pipLayout }: ExportParams) => {
+    async ({ frontFile, rearFile, inPoint, outPoint, pipLayout, outputHeight: requestedHeight }: ExportParams) => {
       dispatch({ type: 'EXPORT_START' })
+
+      const rearFrames: RearFrame[] = []
 
       try {
         const frontInput = new Input({
@@ -31,22 +40,61 @@ export function useVideoExport(dispatch: React.Dispatch<Action>) {
           formats: ALL_FORMATS,
         })
 
-        // Get front video dimensions for compositing
         const frontVideoTrack = await frontInput.getPrimaryVideoTrack()
         if (!frontVideoTrack) {
           dispatch({ type: 'EXPORT_ERROR', message: 'No video track found' })
           return
         }
-        const outputWidth = frontVideoTrack.displayWidth
-        const outputHeight = frontVideoTrack.displayHeight
 
-        // Set up rear video input for PiP compositing
-        let rearInput: Input | undefined
-        if (rearFile && pipLayout) {
-          rearInput = new Input({
-            source: new BlobSource(rearFile),
+        // Scale to requested resolution (or use original if null)
+        const sourceWidth = frontVideoTrack.displayWidth
+        const sourceHeight = frontVideoTrack.displayHeight
+        const aspect = sourceWidth / sourceHeight
+        const outputHeight = requestedHeight ?? sourceHeight
+        const outputWidth = Math.round(outputHeight * aspect)
+
+        // Pre-decode rear video frames if we have a rear file and PiP layout
+        const hasPip = !!(rearFile && pipLayout)
+        if (hasPip) {
+          dispatch({ type: 'EXPORT_PROGRESS', progress: 0 })
+
+          const rearInput = new Input({
+            source: new BlobSource(rearFile!),
             formats: ALL_FORMATS,
           })
+          const rearTrack = await rearInput.getPrimaryVideoTrack()
+          if (rearTrack) {
+            const sink = new VideoSampleSink(rearTrack)
+            for await (const sample of sink.samples(inPoint, outPoint)) {
+              const tempCanvas = new OffscreenCanvas(
+                sample.displayWidth,
+                sample.displayHeight,
+              )
+              const tempCtx = tempCanvas.getContext('2d')!
+              sample.draw(tempCtx, 0, 0)
+              const bitmap = await createImageBitmap(tempCanvas)
+              // Store timestamp relative to trim start so it matches the front video's
+              // trimmed timeline (which starts at 0)
+              rearFrames.push({ timestamp: sample.timestamp - inPoint, bitmap })
+            }
+          }
+        }
+
+        // Find closest rear frame by timestamp (binary search for efficiency)
+        function findRearFrame(timestamp: number): ImageBitmap | null {
+          if (rearFrames.length === 0) return null
+          let lo = 0
+          let hi = rearFrames.length - 1
+          while (lo < hi) {
+            const mid = (lo + hi) >> 1
+            if (rearFrames[mid].timestamp < timestamp) lo = mid + 1
+            else hi = mid
+          }
+          // Check if previous index is closer
+          if (lo > 0 && Math.abs(rearFrames[lo - 1].timestamp - timestamp) < Math.abs(rearFrames[lo].timestamp - timestamp)) {
+            lo--
+          }
+          return rearFrames[lo].bitmap
         }
 
         const target = new BufferTarget()
@@ -55,35 +103,40 @@ export function useVideoExport(dispatch: React.Dispatch<Action>) {
           target,
         })
 
-        // Set up compositing canvas if we have a rear view
         let ctx: OffscreenCanvasRenderingContext2D | null = null
 
         const conversionOptions: Parameters<typeof Conversion.init>[0] = {
           input: frontInput,
           output,
           trim: { start: inPoint, end: outPoint },
-          video: rearInput && pipLayout
-            ? {
-                codec: 'avc',
-                process: (sample) => {
+          video: {
+            codec: 'avc',
+            processedWidth: outputWidth,
+            processedHeight: outputHeight,
+            process: hasPip
+              ? (sample) => {
                   if (!ctx) {
                     const canvas = new OffscreenCanvas(outputWidth, outputHeight)
                     ctx = canvas.getContext('2d')!
                   }
 
-                  // Draw front video full-size
+                  // Draw front video scaled to 720p
                   sample.draw(ctx, 0, 0, outputWidth, outputHeight)
 
-                  // TODO: Draw rear video PiP overlay
-                  // This requires reading rear frames in sync, which needs
-                  // a separate decoding pipeline. For now, export front only.
+                  // Draw rear video PiP overlay
+                  const rearBitmap = findRearFrame(sample.timestamp)
+                  if (rearBitmap && pipLayout) {
+                    const pipW = Math.round(pipLayout.width * outputWidth)
+                    const pipH = Math.round(pipW * rearBitmap.height / rearBitmap.width)
+                    const pipX = Math.round(pipLayout.x * outputWidth)
+                    const pipY = Math.round(pipLayout.y * outputHeight)
+                    ctx.drawImage(rearBitmap, pipX, pipY, pipW, pipH)
+                  }
 
                   return ctx.canvas
-                },
-                processedWidth: outputWidth,
-                processedHeight: outputHeight,
-              }
-            : undefined,
+                }
+              : undefined,
+          },
         }
 
         const conversion = await Conversion.init(conversionOptions)
@@ -115,6 +168,10 @@ export function useVideoExport(dispatch: React.Dispatch<Action>) {
           })
         }
       } finally {
+        // Clean up rear frame bitmaps
+        for (const frame of rearFrames) {
+          frame.bitmap.close()
+        }
         conversionRef.current = null
       }
     },

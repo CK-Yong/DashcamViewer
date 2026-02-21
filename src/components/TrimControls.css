@@ -163,6 +163,21 @@
   white-space: nowrap;
 }
 
+.trim-controls__resolution {
+  padding: 0.3rem 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.trim-controls__resolution:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
 @media (prefers-color-scheme: light) {
   .trim-controls__track {
     background: rgba(0, 0, 0, 0.1);
@@ -178,6 +193,15 @@
   }
 
   .trim-controls__progress-bar {
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  .trim-controls__resolution {
+    border-color: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  .trim-controls__resolution:hover {
     background: rgba(0, 0, 0, 0.08);
   }
 }

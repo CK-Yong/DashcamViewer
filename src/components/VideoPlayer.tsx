@@ -1,6 +1,6 @@
 import type { RefObject } from 'react'
 import { useCallback, useRef, useState } from 'react'
-import type { AppMode, TrimState, ExportState } from '../types'
+import type { AppMode, TrimState, ExportState, PipLayout } from '../types'
 import { PlaybackControls } from './PlaybackControls'
 import { TrimControls } from './TrimControls'
 import './VideoPlayer.css'
@@ -37,7 +37,7 @@ type VideoPlayerProps = {
   onSetTrimOut?: () => void
   onClearTrim?: () => void
   exportState?: ExportState
-  onExport?: () => void
+  onExport?: (pipLayout: PipLayout | undefined, outputHeight: number | null) => void
   onExportReset?: () => void
 }
 
@@ -225,7 +225,20 @@ export function VideoPlayer({
             onSetIn={onSetTrimIn}
             onSetOut={onSetTrimOut}
             onClear={onClearTrim}
-            onExport={onExport}
+            onExport={(outputHeight) => {
+              // Compute PiP layout as fractions of player dimensions
+              const player = playerRef.current
+              if (rearSrc && player) {
+                const bounds = player.getBoundingClientRect()
+                onExport({
+                  x: pipPos.x / bounds.width,
+                  y: pipPos.y / bounds.height,
+                  width: pipWidth,
+                }, outputHeight)
+              } else {
+                onExport(undefined, outputHeight)
+              }
+            }}
             onExportReset={onExportReset}
           />
         )}

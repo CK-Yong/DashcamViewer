@@ -1,5 +1,13 @@
+import { useState } from 'react'
 import type { TrimState, ExportState } from '../types'
 import './TrimControls.css'
+
+const RESOLUTION_OPTIONS = [
+  { value: 720, label: '720p' },
+  { value: 1080, label: '1080p' },
+  { value: 1440, label: '1440p' },
+  { value: 0, label: 'Original' },
+] as const
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60)
@@ -16,7 +24,7 @@ type TrimControlsProps = {
   onSetIn: () => void
   onSetOut: () => void
   onClear: () => void
-  onExport: () => void
+  onExport: (outputHeight: number | null) => void
   onExportReset: () => void
 }
 
@@ -31,6 +39,8 @@ export function TrimControls({
   onExport,
   onExportReset,
 }: TrimControlsProps) {
+  const [outputHeight, setOutputHeight] = useState(1080)
+
   const canExport =
     trim.inPoint !== null &&
     trim.outPoint !== null &&
@@ -125,13 +135,24 @@ export function TrimControls({
             </div>
           )}
           {exportState.status.phase === 'idle' && (
-            <button
-              className="trim-controls__btn trim-controls__btn--export"
-              onClick={onExport}
-              disabled={!canExport}
-            >
-              Export Clip
-            </button>
+            <>
+              <select
+                className="trim-controls__resolution"
+                value={outputHeight}
+                onChange={(e) => setOutputHeight(Number(e.target.value))}
+              >
+                {RESOLUTION_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              <button
+                className="trim-controls__btn trim-controls__btn--export"
+                onClick={() => onExport(outputHeight || null)}
+                disabled={!canExport}
+              >
+                Export Clip
+              </button>
+            </>
           )}
         </div>
       </div>
