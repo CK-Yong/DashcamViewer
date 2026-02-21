@@ -1,5 +1,5 @@
 import type { RefObject } from 'react'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AppMode, TrimState, ExportState, PipLayout } from '../types'
 import { PlaybackControls } from './PlaybackControls'
 import { TrimControls } from './TrimControls'
@@ -138,6 +138,27 @@ export function VideoPlayer({
     dragRef.current = null
   }, [])
 
+  // Re-clamp PiP position when the player container resizes (e.g. mode switch)
+  const pipPosRef = useRef(pipPos)
+  const pipWidthRef = useRef(pipWidth)
+  pipPosRef.current = pipPos
+  pipWidthRef.current = pipWidth
+
+  useEffect(() => {
+    const player = playerRef.current
+    if (!player) return
+    const observer = new ResizeObserver(() => {
+      const pos = pipPosRef.current
+      const w = pipWidthRef.current
+      const clamped = clamp(pos.x, pos.y, w)
+      if (clamped.x !== pos.x || clamped.y !== pos.y) {
+        setPipPos({ x: clamped.x, y: clamped.y })
+      }
+    })
+    observer.observe(player)
+    return () => observer.disconnect()
+  }, [clamp])
+
   if (!src) {
     return (
       <div className="video-player video-player--empty">
@@ -226,14 +247,36 @@ export function VideoPlayer({
             onSetOut={onSetTrimOut}
             onClear={onClearTrim}
             onExport={(outputHeight) => {
-              // Compute PiP layout as fractions of player dimensions
+              // Compute PiP layout as fractions of the actual rendered video area,
+              // accounting for object-fit: contain letterboxing
               const player = playerRef.current
-              if (rearSrc && player) {
+              const video = videoRef.current
+              if (rearSrc && player && video) {
                 const bounds = player.getBoundingClientRect()
+                const videoAspect = video.videoWidth / video.videoHeight
+                const containerAspect = bounds.width / bounds.height
+
+                let videoW: number, videoH: number, videoX: number, videoY: number
+                if (videoAspect > containerAspect) {
+                  // Video is wider — letterboxed top/bottom
+                  videoW = bounds.width
+                  videoH = bounds.width / videoAspect
+                  videoX = 0
+                  videoY = (bounds.height - videoH) / 2
+                } else {
+                  // Video is taller — pillarboxed left/right
+                  videoH = bounds.height
+                  videoW = bounds.height * videoAspect
+                  videoX = (bounds.width - videoW) / 2
+                  videoY = 0
+                }
+
+                // Express PiP position relative to the rendered video rect
+                const pipPixelW = pipWidth * bounds.width
                 onExport({
-                  x: pipPos.x / bounds.width,
-                  y: pipPos.y / bounds.height,
-                  width: pipWidth,
+                  x: (pipPos.x - videoX) / videoW,
+                  y: (pipPos.y - videoY) / videoH,
+                  width: pipPixelW / videoW,
                 }, outputHeight)
               } else {
                 onExport(undefined, outputHeight)

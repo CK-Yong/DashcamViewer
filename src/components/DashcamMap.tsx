@@ -17,11 +17,16 @@ export function DashcamMap({ allTracks, activeTrackIndex, position }: DashcamMap
   const markerRef = useRef<L.CircleMarker | null>(null)
   const [isFollowing, setIsFollowing] = useState(false)
   const isFollowingRef = useRef(false)
+  const positionRef = useRef(position)
 
-  // Keep ref in sync with state (for use inside Leaflet event handlers)
+  // Keep refs in sync with props/state (for use inside Leaflet event handlers)
   useEffect(() => {
     isFollowingRef.current = isFollowing
   }, [isFollowing])
+
+  useEffect(() => {
+    positionRef.current = position
+  }, [position])
 
   // Initialize map once
   useEffect(() => {
@@ -48,9 +53,24 @@ export function DashcamMap({ allTracks, activeTrackIndex, position }: DashcamMap
 
     mapRef.current = map
 
+    // Restore position marker if position was already set before map mounted
+    const pos = positionRef.current
+    if (pos) {
+      const marker = L.circleMarker([pos.latitude, pos.longitude], {
+        radius: 7,
+        fillColor: '#ef4444',
+        fillOpacity: 1,
+        color: '#ffffff',
+        weight: 2,
+        pane: 'navdotPane',
+      }).addTo(map)
+      markerRef.current = marker
+    }
+
     return () => {
       map.remove()
       mapRef.current = null
+      markerRef.current = null
     }
   }, [])
 
