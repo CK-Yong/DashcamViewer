@@ -13,7 +13,7 @@ type HeaderProps = {
 export function Header({ mode, onModeChange, onFilesSelected, onClearAll, hasVideos }: HeaderProps) {
   return (
     <header className="header">
-      <h1>Dashcam Viewer</h1>
+      <h1 className="header__title">Dashcam Viewer</h1>
       <div className="header-mode-toggle">
         <button
           className={`header-mode-toggle__btn ${mode === 'viewer' ? 'header-mode-toggle__btn--active' : ''}`}

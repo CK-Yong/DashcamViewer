@@ -1,25 +1,36 @@
 .gps-stats {
   display: flex;
-  gap: 1rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.8rem;
-  opacity: 0.8;
+  gap: 1.25rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
 }
 
 .gps-stats__extracting {
   margin: 0;
+  font-size: 0.85rem;
   font-style: italic;
+  color: var(--color-text-dim);
 }
 
 .gps-stats__item {
   display: flex;
-  gap: 0.35rem;
+  align-items: baseline;
+  gap: 0.4rem;
 }
 
 .gps-stats__label {
-  opacity: 0.6;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-dim);
 }
 
 .gps-stats__value {
+  font-size: 0.92rem;
   font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }

@@ -11,6 +11,37 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* === Color tokens === */
+  --color-bg:           #242424;
+  --color-surface:      #2e2e2e;
+  --color-surface-2:    #383838;
+  --color-border:       rgba(255, 255, 255, 0.1);
+  --color-border-hover: rgba(255, 255, 255, 0.22);
+  --color-text:         rgba(255, 255, 255, 0.87);
+  --color-text-dim:     rgba(255, 255, 255, 0.5);
+  --color-accent:       #646cff;
+  --color-accent-bg:    rgba(100, 108, 255, 0.18);
+  --color-accent-hover: rgba(100, 108, 255, 0.35);
+  --color-success:      #34d399;
+  --color-success-bg:   rgba(52, 211, 153, 0.18);
+  --color-error:        #f87171;
+
+  /* === Radius tokens === */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* === Control button tokens (shared across PlaybackControls, TrimControls, Header) === */
+  --ctrl-btn-size:    32px;
+  --ctrl-btn-padding: 0.25rem 0.5rem;
+  --ctrl-btn-font:    0.82rem;
+  --ctrl-btn-radius:  var(--radius-md);
+
+  /* === Timeline tokens === */
+  --timeline-track-h:    12px;
+  --timeline-marker-w:   3px;
+  --timeline-playhead-w: 2px;
 }
 
 *,
@@ -31,7 +62,7 @@ body {
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--color-accent);
   text-decoration: inherit;
 }
 a:hover {
@@ -39,25 +70,26 @@ a:hover {
 }
 
 h1 {
-  font-size: 1.8em;
-  line-height: 1.1;
+  font-size: 1.1rem;
+  line-height: 1.3;
+  font-weight: 600;
   margin: 0;
 }
 
 button {
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+  padding: var(--ctrl-btn-padding);
+  font-size: var(--ctrl-btn-font);
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--color-surface);
   color: inherit;
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--color-accent);
 }
 button:focus,
 button:focus-visible {
@@ -73,13 +105,23 @@ button:disabled:hover {
 
 @media (prefers-color-scheme: light) {
   :root {
+    --color-bg:           #f5f5f5;
+    --color-surface:      #ffffff;
+    --color-surface-2:    #ebebeb;
+    --color-border:       rgba(0, 0, 0, 0.1);
+    --color-border-hover: rgba(0, 0, 0, 0.2);
+    --color-text:         #213547;
+    --color-text-dim:     rgba(33, 53, 71, 0.55);
+    --color-accent-bg:    rgba(100, 108, 255, 0.12);
+    --color-accent-hover: rgba(100, 108, 255, 0.22);
+
     color: #213547;
-    background-color: #ffffff;
+    background-color: #f5f5f5;
   }
   a:hover {
     color: #747bff;
   }
   button {
-    background-color: #f9f9f9;
+    background-color: var(--color-surface);
   }
 }

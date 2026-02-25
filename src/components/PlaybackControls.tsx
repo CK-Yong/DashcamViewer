@@ -95,6 +95,7 @@ type PlaybackControlsProps = {
   isMuted: boolean
   onChangeVolume: (volume: number) => void
   onToggleMute: () => void
+  hideSeekbar?: boolean
 }
 
 export function PlaybackControls({
@@ -117,6 +118,7 @@ export function PlaybackControls({
   isMuted,
   onChangeVolume,
   onToggleMute,
+  hideSeekbar = false,
 }: PlaybackControlsProps) {
   function cycleSpeed() {
     const currentIdx = SPEED_OPTIONS.indexOf(
@@ -128,20 +130,22 @@ export function PlaybackControls({
 
   return (
     <div className="playback-controls">
-      <div className="playback-controls__seekbar">
-        <span className="playback-controls__time">{formatTime(currentTime)}</span>
-        <input
-          type="range"
-          className="playback-controls__slider"
-          min={0}
-          max={duration || 0}
-          step={0.1}
-          value={currentTime}
-          onChange={(e) => onSeek(Number(e.target.value))}
-          disabled={!hasVideo}
-        />
-        <span className="playback-controls__time">{formatTime(duration)}</span>
-      </div>
+      {!hideSeekbar && (
+        <div className="playback-controls__seekbar">
+          <span className="playback-controls__time">{formatTime(currentTime)}</span>
+          <input
+            type="range"
+            className="playback-controls__slider"
+            min={0}
+            max={duration || 0}
+            step={0.1}
+            value={currentTime}
+            onChange={(e) => onSeek(Number(e.target.value))}
+            disabled={!hasVideo}
+          />
+          <span className="playback-controls__time">{formatTime(duration)}</span>
+        </div>
+      )}
       <div className="playback-controls__buttons">
         <div className="playback-controls__group">
           <button

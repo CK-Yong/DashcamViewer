@@ -124,7 +124,7 @@ function App() {
         hasVideos={state.playlist.length > 0}
       />
       <div className={`main-layout ${state.mode === 'editor' ? 'main-layout--editor' : ''}`}>
-        <div className="video-section">
+        <div className="video-section panel-card">
           <VideoPlayer
             videoRef={videoPlayer.videoRef}
             rearVideoRef={videoPlayer.rearVideoRef}
@@ -172,16 +172,18 @@ function App() {
         )}
       </div>
       {state.mode === 'viewer' && <GpsStats gps={state.gps} />}
-      <PlaylistPanel
-        playlist={state.playlist}
-        currentIndex={state.currentIndex}
-        dashCamVideos={state.gps.dashCamVideos}
-        onSelect={(index) => dispatch({ type: 'SELECT_VIDEO', index })}
-        onRemove={(id) => dispatch({ type: 'REMOVE_VIDEO', id })}
-        onReorder={(activeId, overId) =>
-          dispatch({ type: 'REORDER_PLAYLIST', activeId, overId })
-        }
-      />
+      <div className="bottom-row panel-card">
+        <PlaylistPanel
+          playlist={state.playlist}
+          currentIndex={state.currentIndex}
+          dashCamVideos={state.gps.dashCamVideos}
+          onSelect={(index) => dispatch({ type: 'SELECT_VIDEO', index })}
+          onRemove={(id) => dispatch({ type: 'REMOVE_VIDEO', id })}
+          onReorder={(activeId, overId) =>
+            dispatch({ type: 'REORDER_PLAYLIST', activeId, overId })
+          }
+        />
+      </div>
     </div>
   )
 }

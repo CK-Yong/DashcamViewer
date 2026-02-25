@@ -26,6 +26,7 @@ type TrimControlsProps = {
   onClear: () => void
   onExport: (outputHeight: number | null) => void
   onExportReset: () => void
+  onSeek: (time: number) => void
 }
 
 export function TrimControls({
@@ -38,6 +39,7 @@ export function TrimControls({
   onClear,
   onExport,
   onExportReset,
+  onSeek,
 }: TrimControlsProps) {
   const [outputHeight, setOutputHeight] = useState(1080)
 
@@ -56,10 +58,22 @@ export function TrimControls({
   const outPct = trim.outPoint !== null && duration > 0 ? (trim.outPoint / duration) * 100 : null
   const curPct = duration > 0 ? (currentTime / duration) * 100 : 0
 
+  function handleTrackClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (duration <= 0) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const fraction = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+    onSeek(fraction * duration)
+  }
+
   return (
     <div className="trim-controls">
       <div className="trim-controls__timeline">
-        <div className="trim-controls__track">
+        <span className="trim-controls__time">{formatTime(currentTime)}</span>
+        <div
+          className="trim-controls__track"
+          onClick={handleTrackClick}
+          style={{ cursor: duration > 0 ? 'pointer' : 'default' }}
+        >
           {inPct !== null && outPct !== null && (
             <div
               className="trim-controls__range"
@@ -74,6 +88,7 @@ export function TrimControls({
           )}
           <div className="trim-controls__playhead" style={{ left: `${curPct}%` }} />
         </div>
+        <span className="trim-controls__time">{formatTime(duration)}</span>
       </div>
       <div className="trim-controls__actions">
         <div className="trim-controls__points">
@@ -121,9 +136,13 @@ export function TrimControls({
             <div className="trim-controls__progress">
               <div className="trim-controls__progress-bar">
                 <div
-                  className="trim-controls__progress-fill"
+                  className={`trim-controls__progress-fill${exportState.status.phase === 'muxing' ? ' trim-controls__progress-fill--indeterminate' : ''}`}
                   style={{
-                    width: `${exportState.status.phase === 'encoding' ? exportState.status.progress * 100 : exportState.status.phase === 'muxing' ? 100 : 0}%`,
+                    width: exportState.status.phase === 'encoding'
+                      ? `${exportState.status.progress * 100}%`
+                      : exportState.status.phase === 'muxing'
+                      ? undefined
+                      : '0%',
                   }}
                 />
               </div>

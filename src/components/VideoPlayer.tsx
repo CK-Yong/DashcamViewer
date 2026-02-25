@@ -236,6 +236,7 @@ export function VideoPlayer({
           isMuted={isMuted}
           onChangeVolume={onChangeVolume}
           onToggleMute={onToggleMute}
+          hideSeekbar={mode === 'editor'}
         />
         {mode === 'editor' && trim && exportState && onSetTrimIn && onSetTrimOut && onClearTrim && onExport && onExportReset && (
           <TrimControls
@@ -246,6 +247,7 @@ export function VideoPlayer({
             onSetIn={onSetTrimIn}
             onSetOut={onSetTrimOut}
             onClear={onClearTrim}
+            onSeek={onSeek}
             onExport={(outputHeight) => {
               // Compute PiP layout as fractions of the actual rendered video area,
               // accounting for object-fit: contain letterboxing

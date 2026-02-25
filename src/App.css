@@ -30,6 +30,22 @@
   grid-template-columns: 1fr;
 }
 
+.bottom-row {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 120px;
+  max-height: 30vh;
+}
+
+.panel-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  padding: 0.5rem;
+}
+
 @media (max-width: 768px) {
   .main-layout {
     grid-template-columns: 1fr;

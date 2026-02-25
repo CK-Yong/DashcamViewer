@@ -60,9 +60,10 @@ export function PlaylistPanel({
 
   return (
     <div className="playlist-panel">
-      <h2 className="playlist-panel__title">
-        Playlist ({playlist.length} video{playlist.length !== 1 ? 's' : ''})
-      </h2>
+      <div className="playlist-panel__header">
+        <span className="playlist-panel__label">Playlist</span>
+        <span className="playlist-panel__count">{playlist.length}</span>
+      </div>
       <div className="playlist-panel__list">
         <DndContext
           sensors={sensors}
